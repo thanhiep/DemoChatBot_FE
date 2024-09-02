@@ -17,8 +17,9 @@
     let data = {
       question,
     };
+    let AIAnswer = "";
     userQuestion = question;
-    question = ""
+    question = "";
     loader = `
           <div class="userAsk">
                 <p class="textContent">${userQuestion}</p>
@@ -41,7 +42,7 @@
 
         question = "";
 
-        let AIAnswer = response.data;
+        AIAnswer = response.data;
 
         content += `
             <div class="userAsk">
@@ -52,7 +53,7 @@
                 <img class="avt" src="${avtollama}"> 
                 <p class="textContent">${AIAnswer}</p>
             </div>`;
-
+       
         setTimeout(() => {
           scrollableContainer.scrollTop = scrollableContainer.scrollHeight;
         }, 0);
