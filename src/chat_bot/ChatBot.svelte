@@ -9,34 +9,26 @@
   let question = "";
   let userQuestion = "";
   let scrollableContainer;
+  let isLoading = false
 
-  let displayedText = ""; // Chuỗi sẽ hiển thị từ từ
-  let index = 0;
-  let typingSpeed = 50; // Tốc độ đánh chữ (ms/ký tự)
-//   let fullText = ""
-
-  const typeWriter = (/** @type {string} */ fullText) => {
-    if (fullText && index < fullText.length) {
-      displayedText += fullText.charAt(index);
-      index++;
-      setTimeout(()=>{
-        typeWriter(fullText)
-    }, typingSpeed);
-    }
-  };
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    isLoading = true
     let data = {
       question,
     };
     userQuestion = question;
-    axios
-      .post("http://127.0.0.1:8000/question", data)
-      .then( (response) => {
-        question = "";
-        let fullText = response.data
-    
-       typeWriter(fullText);
 
+    try {
+      if (data.question != "") {
+        const response = await axios.post(
+          "http://127.0.0.1:8000/question",
+          data
+        );
+
+        question = "";
+
+        let AIAnswer = response.data;
+       
         content += `
             <div class="userAsk">
                 <p class="textContent">${userQuestion}</p>
@@ -44,15 +36,19 @@
             </div>
             <div class="AIReply">
                 <img class="avt" src="${avtollama}"> 
-                <p class="textContent" id="answer">${displayedText}</p>
+                <p class="textContent">${AIAnswer}</p>
             </div>`;
-
 
         setTimeout(() => {
           scrollableContainer.scrollTop = scrollableContainer.scrollHeight;
         }, 0);
-      })
-      .catch((error) => console.log(error));
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      isLoading = false
+    }
+
   };
 </script>
 
@@ -68,7 +64,7 @@
       bind:value={question}
       placeholder="Type your question here"
     />
-    <button class="submitButton" type="submit">
+    <button disabled={isLoading} class="submitButton" type="submit">
       <span>
         <FontAwesomeIcon class="sendIcon" icon={faArrowUp} />
       </span>
