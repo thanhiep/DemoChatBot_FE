@@ -9,15 +9,29 @@
   let question = "";
   let userQuestion = "";
   let scrollableContainer;
-  let isLoading = false
+  let isLoading = false;
+  let loader = "";
 
   const handleSubmit = async () => {
-    isLoading = true
+    isLoading = true;
     let data = {
       question,
     };
     userQuestion = question;
-
+    question = ""
+    loader = `
+          <div class="userAsk">
+                <p class="textContent">${userQuestion}</p>
+                <img class="avt" src="${avtuser}"> 
+            </div>
+            <div class="AIReply">
+                  <img class="avt" src="${avtollama}"> 
+                  <div class="loader"></div>
+            </div>
+    `;
+    setTimeout(() => {
+      scrollableContainer.scrollTop = scrollableContainer.scrollHeight;
+    }, 0);
     try {
       if (data.question != "") {
         const response = await axios.post(
@@ -28,7 +42,7 @@
         question = "";
 
         let AIAnswer = response.data;
-       
+
         content += `
             <div class="userAsk">
                 <p class="textContent">${userQuestion}</p>
@@ -46,15 +60,17 @@
     } catch (error) {
       throw error;
     } finally {
-      isLoading = false
+      isLoading = false;
     }
-
   };
 </script>
 
 <h1>CHAT BOX</h1>
 <div class="chatContent" bind:this={scrollableContainer}>
   {@html content}
+  {#if isLoading}
+    {@html loader}
+  {/if}
 </div>
 <form on:submit|preventDefault={handleSubmit}>
   <div class="formInput">
